@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  adminapp:
+    image: ${DOCKER_REGISTRY}adminapp
+    build:
+      context: .
+      dockerfile: AdminApp/Dockerfile
