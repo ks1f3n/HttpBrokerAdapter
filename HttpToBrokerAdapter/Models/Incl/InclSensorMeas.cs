@@ -6,7 +6,7 @@ namespace HttpToBrokerAdapter.Models.Incl
 {
     public class InclSensorMeas : ISensorMeas
     {
-        public InclSensorMeas(int x, int y, int t, long ts, int x0 = 1024, int y0 = 1024)
+        public InclSensorMeas(int x, int y, int t, long ts, int x0 = -74, int y0 = 3)
         {
             X = GetAngDelta(x, x0);
             Y = GetAngDelta(y, y0);
@@ -24,7 +24,7 @@ namespace HttpToBrokerAdapter.Models.Incl
 
         public static float GetAngDelta(int d, int d0)
         {
-            return (float)Math.Round(Math.Asin(((float)(d0 - 1024 - d) / 1638) * (180 * Math.PI)), 5);
+            return (float)Math.Round(Math.Asin((float)(d0 + 1024 - d) / 1638), 5);
         }
 
         private static float GetTemp(int temp)

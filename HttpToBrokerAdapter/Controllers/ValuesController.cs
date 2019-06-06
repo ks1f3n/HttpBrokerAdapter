@@ -70,12 +70,13 @@ namespace HttpToBrokerAdapter.Controllers
         public async Task<IActionResult> CreateInclAsync([FromForm] CreateInclSensorDto createInclSensorDto)
         {
             try
-            {
+            {                
                 if (!_mqttClient.IsConnected)
                     await _mqttClient.ConnectAsync(_clientOptions);
 
                 if (createInclSensorDto.X!=null)
                 {
+                    _logger.LogInformation("X: {0}; Y: {1}", createInclSensorDto.X[0], createInclSensorDto.Y[0]);
                     var info = new SensorInfo(createInclSensorDto.PER, createInclSensorDto.VOLT, createInclSensorDto.CSQ);
                     var meas = createInclSensorDto.X.Select((x, i) => new InclSensorMeas(x, createInclSensorDto.Y[i], createInclSensorDto.T[i], createInclSensorDto.TS[i]));
                     var msg = new Message(info, meas);
@@ -95,7 +96,7 @@ namespace HttpToBrokerAdapter.Controllers
                 var dateTimeOffset = new DateTimeOffset(dateNow);
                 var unixDateTime = dateTimeOffset.ToUnixTimeSeconds();
 
-                return Ok(String.Format("UID={0}, ST={1}, TS={2}, SPER={3}, MPER={4}, IGVAL={5},CRVAL={6},", createInclSensorDto.UID, createInclSensorDto.ST, unixDateTime, 120, 10, 2, 150));
+                return Ok(String.Format("UID={0}, ST={1}, TS={2}, SPER={3}, MPER={4}, IGVAL={5},CRVAL={6},", createInclSensorDto.UID, createInclSensorDto.ST, unixDateTime, 1200, 10, 2, 150));
             }
             catch (Exception ex)
             {
