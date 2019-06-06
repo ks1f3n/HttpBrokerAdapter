@@ -74,19 +74,22 @@ namespace HttpToBrokerAdapter.Controllers
                 if (!_mqttClient.IsConnected)
                     await _mqttClient.ConnectAsync(_clientOptions);
 
-                var info = new SensorInfo(createInclSensorDto.PER, createInclSensorDto.VOLT, createInclSensorDto.CSQ);
-                var meas = createInclSensorDto.X.Select((x, i) => new InclSensorMeas(x, createInclSensorDto.Y[i], createInclSensorDto.T[i], createInclSensorDto.TS[i]));
-                var msg = new Message(info, meas);
+                if (createInclSensorDto.X!=null)
+                {
+                    var info = new SensorInfo(createInclSensorDto.PER, createInclSensorDto.VOLT, createInclSensorDto.CSQ);
+                    var meas = createInclSensorDto.X.Select((x, i) => new InclSensorMeas(x, createInclSensorDto.Y[i], createInclSensorDto.T[i], createInclSensorDto.TS[i]));
+                    var msg = new Message(info, meas);
 
-                var str = JsonConvert.SerializeObject(msg);
+                    var str = JsonConvert.SerializeObject(msg);
 
-                var message = new MqttApplicationMessageBuilder()
-                    .WithTopic("legacy/incl/" + createInclSensorDto.UID)
-                    .WithPayload(str)
-                    .WithAtMostOnceQoS()
-                    .Build();
+                    var message = new MqttApplicationMessageBuilder()
+                        .WithTopic("legacy/incl/" + createInclSensorDto.UID)
+                        .WithPayload(str)
+                        .WithAtMostOnceQoS()
+                        .Build();
 
-                await _mqttClient.PublishAsync(message);
+                    await _mqttClient.PublishAsync(message);
+                }                
 
                 var dateNow = DateTime.Now;
                 var dateTimeOffset = new DateTimeOffset(dateNow);
