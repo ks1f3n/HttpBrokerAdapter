@@ -24,7 +24,7 @@ namespace HttpToBrokerAdapter.Models.Incl
 
         public static float GetAngDelta(int d, int d0)
         {
-            return (float)Math.Round(Math.Asin((float)(d0 - 1024 - d) / 1638), 5);
+            return (float)Math.Round(Math.Asin(((float)(d0 - 1024 - d) / 1638) * (180 * Math.PI)), 5);
         }
 
         private static float GetTemp(int temp)
