@@ -7,9 +7,9 @@
         public int PER { get; set; }
         public int VOLT { get; set; }
         public int CSQ { get; set; }
-        public string[] X { get; set; }
-        public string[] Y { get; set; }
-        public string[] T { get; set; }
-        public string[] TS { get; set; }
+        public int[] X { get; set; }
+        public int[] Y { get; set; }
+        public int[] T { get; set; }
+        public long[] TS { get; set; }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace HttpToBrokerAdapter.Models
 {
     public class SensorInfo
     {
-        public SensorInfo(int per, float volt, int csq)
+        public SensorInfo(int per, int volt, int csq)
         {
             Per = per;
-            Volt = volt;
+            Volt = GetVolt(volt);
             Csq = csq;
         }
         [JsonProperty(PropertyName = "per")]
@@ -16,5 +17,9 @@ namespace HttpToBrokerAdapter.Models
         public float Volt { get; set; }
         [JsonProperty(PropertyName = "csq")]
         public int Csq { get; set; }
+        public static float GetVolt(int volt)
+        {
+            return (float)Math.Round((volt * 2.56 * 2) / 1024, 5);
+        }
     }
 }

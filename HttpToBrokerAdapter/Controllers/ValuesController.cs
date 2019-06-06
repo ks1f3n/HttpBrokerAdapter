@@ -31,7 +31,7 @@ namespace HttpToBrokerAdapter.Controllers
         }
 
         [HttpPost("Gap/{id}")]
-        public async Task<IActionResult> CreateGapAsync(int id, [FromForm] CreateGapSensorDto createGapSensorDto)
+        public async Task<IActionResult> CreateGapAsync([FromForm] CreateGapSensorDto createGapSensorDto)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace HttpToBrokerAdapter.Controllers
                 var str = JsonConvert.SerializeObject(msg);
 
                 var message = new MqttApplicationMessageBuilder()
-                    .WithTopic("legacy/gap/" + id)
+                    .WithTopic("legacy/gap/" + createGapSensorDto.ID)
                     .WithPayload(str)
                     .WithAtMostOnceQoS()
                     .Build();
@@ -67,7 +67,7 @@ namespace HttpToBrokerAdapter.Controllers
         }
 
         [HttpPost("Incl/{id}")]
-        public async Task<IActionResult> CreateInclAsync(int id, [FromForm] CreateInclSensorDto createInclSensorDto)
+        public async Task<IActionResult> CreateInclAsync([FromForm] CreateInclSensorDto createInclSensorDto)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace HttpToBrokerAdapter.Controllers
                 var str = JsonConvert.SerializeObject(msg);
 
                 var message = new MqttApplicationMessageBuilder()
-                    .WithTopic("legacy/incl/" + id)
+                    .WithTopic("legacy/incl/" + createInclSensorDto.UID)
                     .WithPayload(str)
                     .WithAtMostOnceQoS()
                     .Build();
