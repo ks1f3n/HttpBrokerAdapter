@@ -10,5 +10,6 @@ namespace SqlAdapterCore.Model
         public int X { get; set; }
         public int InitY { get; set; }
         public int Y { get; set; }
+        public int Period { get; set; }
     }
 }

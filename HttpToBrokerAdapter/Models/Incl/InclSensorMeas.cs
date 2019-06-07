@@ -6,7 +6,7 @@ namespace HttpToBrokerAdapter.Models.Incl
 {
     public class InclSensorMeas : ISensorMeas
     {
-        public InclSensorMeas(int x, int y, int t, long ts, int x0 = -74, int y0 = 3)
+        public InclSensorMeas(int x, int y, int t, long ts, int x0 = 0, int y0 = 0)
         {
             X = GetAngDelta(x, x0);
             Y = GetAngDelta(y, y0);

@@ -9,6 +9,7 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using Newtonsoft.Json;
+using SqlAdapterCore.Model;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,25 +39,31 @@ namespace HttpToBrokerAdapter.Controllers
                 if (!_mqttClient.IsConnected)
                     await _mqttClient.ConnectAsync(_clientOptions);
 
-                var info = new SensorInfo(createGapSensorDto.PER, createGapSensorDto.VOLT, createGapSensorDto.CSQ);
-                var meas = createGapSensorDto.v.Select((d, i) => new GapSensorMeas(d, createGapSensorDto.t[i]));
-                var msg = new Message(info, meas);
+                if (createGapSensorDto.v != null)
+                {
+                    Gap.Value = createGapSensorDto.v[0];
+                    _logger.LogInformation("D: {0} D0: {1}", createGapSensorDto.v[0], Gap.InitValue);
+                    var info = new SensorInfo(createGapSensorDto.PER, createGapSensorDto.VOLT, createGapSensorDto.CSQ);
+                    var meas = createGapSensorDto.v.Select((d, i) => new GapSensorMeas(d, createGapSensorDto.t[i], Gap.InitValue));
+                    var msg = new Message(info, meas);
 
-                var str = JsonConvert.SerializeObject(msg);
+                    var str = JsonConvert.SerializeObject(msg);
 
-                var message = new MqttApplicationMessageBuilder()
-                    .WithTopic("legacy/gap/" + createGapSensorDto.ID)
-                    .WithPayload(str)
-                    .WithAtMostOnceQoS()
-                    .Build();
+                    var message = new MqttApplicationMessageBuilder()
+                        .WithTopic("legacy/gap/" + createGapSensorDto.ID)
+                        .WithPayload(str)
+                        .WithAtMostOnceQoS()
+                        .Build();
 
-                await _mqttClient.PublishAsync(message);
+                    await _mqttClient.PublishAsync(message);
 
-                var dateNow = DateTime.Now;
-                var dateTimeOffset = new DateTimeOffset(dateNow);
-                var unixDateTime = dateTimeOffset.ToUnixTimeSeconds();
-
-                return Ok(String.Format("PER={0},TSP={1},ENC={2},", 120, unixDateTime, 6));
+                    var dateNow = DateTime.Now;
+                    var dateTimeOffset = new DateTimeOffset(dateNow);
+                    var unixDateTime = dateTimeOffset.ToUnixTimeSeconds();
+                }
+                var sper = Gap.Period > 0 ? Gap.Period : 120;
+                var mper = sper / 20;
+                return Ok(String.Format("PER={0},TSP={1},ENC={2},", sper, unixDateTime, mper));
             }
             catch (Exception ex)
             {
@@ -76,9 +83,11 @@ namespace HttpToBrokerAdapter.Controllers
 
                 if (createInclSensorDto.X!=null)
                 {
-                    _logger.LogInformation("X: {0}; Y: {1}", createInclSensorDto.X[0], createInclSensorDto.Y[0]);
+                    Incl.X = createInclSensorDto.X[0];
+                    Incl.Y = createInclSensorDto.Y[0];
+                    _logger.LogInformation("X: {0}; Y: {1}; X0: {0}; Y0: {1}", createInclSensorDto.X[0], createInclSensorDto.Y[0], Gap.InitX, Incl.InitY);
                     var info = new SensorInfo(createInclSensorDto.PER, createInclSensorDto.VOLT, createInclSensorDto.CSQ);
-                    var meas = createInclSensorDto.X.Select((x, i) => new InclSensorMeas(x, createInclSensorDto.Y[i], createInclSensorDto.T[i], createInclSensorDto.TS[i]));
+                    var meas = createInclSensorDto.X.Select((x, i) => new InclSensorMeas(x, createInclSensorDto.Y[i], createInclSensorDto.T[i], createInclSensorDto.TS[i], Gap.InitX, Incl.InitY));
                     var msg = new Message(info, meas);
 
                     var str = JsonConvert.SerializeObject(msg);
@@ -96,7 +105,9 @@ namespace HttpToBrokerAdapter.Controllers
                 var dateTimeOffset = new DateTimeOffset(dateNow);
                 var unixDateTime = dateTimeOffset.ToUnixTimeSeconds();
 
-                return Ok(String.Format("UID={0}, ST={1}, TS={2}, SPER={3}, MPER={4}, IGVAL={5},CRVAL={6},", createInclSensorDto.UID, createInclSensorDto.ST, unixDateTime, 1200, 10, 2, 150));
+                var sper = Incl.Period > 0 ? Incl.Period : 120;
+                var mper = sper / 20;
+                return Ok(String.Format("UID={0}, ST={1}, TS={2}, SPER={3}, MPER={4}, IGVAL={5},CRVAL={6},", createInclSensorDto.UID, createInclSensorDto.ST, unixDateTime, sper, mper, 2, 150));
             }
             catch (Exception ex)
             {
